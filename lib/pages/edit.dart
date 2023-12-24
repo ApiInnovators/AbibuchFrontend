@@ -292,7 +292,10 @@ class InputWidget extends StatelessWidget {
       freundeBilder.add(img);
     }
 
-    final birthdate = dateFormat.parse(birthdateInput!.getInput());
+    if (dateFormat.tryParse(birthdateInput!.getInput()) == null) {
+      return (null, "Ungültiges Geburtsdatumformat");
+    }
+
     final mainImg = mainImageInput.state.getBase64();
 
     if (mainImg == null) {
@@ -302,7 +305,7 @@ class InputWidget extends StatelessWidget {
     return (
       PreviewModel(
         name: userName,
-        geburtsDatum: birthdate,
+        geburtsDatum: birthdateInput!.getInput(),
         freunde: freunde,
         zitate: zitate,
         lieblingslehrer: panel3Inputs[0].getInput(),

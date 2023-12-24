@@ -42,7 +42,7 @@ class Api {
 class PreviewModel {
   final String name;
   final String hauptBildBase64;
-  final DateTime geburtsDatum;
+  final String geburtsDatum;
   final List<String> freunde;
   final List<String> freundeBilderBase64;
   final List<String> zitate;
@@ -75,7 +75,7 @@ class PreviewModel {
   Map<String, dynamic> toJson() {
     return {
       'name': name,
-      'geburts_datum': geburtsDatum.millisecondsSinceEpoch,
+      'geburts_datum': geburtsDatum,
       'freunde': freunde,
       'zitate': zitate,
       'lieblingslehrer': lieblingslehrer,

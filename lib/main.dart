@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hgv_abibuch/pages/edit.dart';
 import 'package:hgv_abibuch/pages/login.dart';
 
 Future<void> main() async {
