@@ -7,7 +7,7 @@ import 'package:http/http.dart';
 
 class Api {
   static final client = Client();
-  static const baseUrl = "http://localhost:8085";
+  static const baseUrl = "https://abibuch.apiinnovators.de";
 
   static Future<Response> _handleRequest(BaseRequest request) async {
     request.headers.addAll({
