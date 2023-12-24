@@ -4,7 +4,6 @@ import 'dart:io';
 
 import 'package:http/http.dart';
 
-
 class Api {
   static final client = Client();
   static const baseUrl = "https://abibuch.apiinnovators.de";
@@ -26,9 +25,9 @@ class Api {
     }
   }
 
-  static Future<Response> login(String name, String password) {
+  static Future<Response> login(LoginModel login) {
     final req = Request("POST", Uri.parse("$baseUrl/login"));
-    req.body = jsonEncode({"name": name, "password": password});
+    req.body = jsonEncode(login.toJson());
     return _handleRequest(req);
   }
 
@@ -39,55 +38,87 @@ class Api {
   }
 }
 
-class PreviewModel {
+class LoginModel {
   final String name;
-  final String hauptBildBase64;
-  final String geburtsDatum;
-  final List<String> freunde;
-  final List<String> freundeBilderBase64;
-  final List<String> zitate;
-  final String lieblingslehrer;
-  final String lieblingsfaecher;
-  final String lieblingsbeschaeftigung;
-  final String plaene;
-  final String groessterErfolg;
-  final String krassestesErlebnis;
-  final String einzigartigkeit;
-  final String textVonFreunden;
+  final String password;
 
-  PreviewModel({
-    required this.name,
-    required this.geburtsDatum,
-    required this.freunde,
-    required this.zitate,
-    required this.lieblingslehrer,
-    required this.lieblingsfaecher,
-    required this.lieblingsbeschaeftigung,
-    required this.plaene,
-    required this.groessterErfolg,
-    required this.krassestesErlebnis,
-    required this.einzigartigkeit,
-    required this.textVonFreunden,
-    required this.freundeBilderBase64,
-    required this.hauptBildBase64,
+  const LoginModel({required this.name, required this.password});
+
+  factory LoginModel.fromJson(Map<String, dynamic> json) =>
+      LoginModel(name: json["name"]!, password: json["password"]!);
+
+  Map<String, dynamic> toJson() => {"name": name, "password": password};
+}
+
+class PreviewModel {
+  LoginModel login;
+  String? hauptBildBase64;
+  String? geburtsDatum;
+  List<String>? freunde;
+  List<String>? freundeBilderBase64;
+  List<String>? zitate;
+  String? lieblingslehrer;
+  String? lieblingsfaecher;
+  String? lieblingsbeschaeftigung;
+  String? plaene;
+  String? groessterErfolg;
+  String? krassestesErlebnis;
+  String? einzigartigkeit;
+  String? textVonFreunden;
+
+  PreviewModel(
+    this.login, {
+    this.hauptBildBase64,
+    this.geburtsDatum,
+    this.freunde,
+    this.freundeBilderBase64,
+    this.zitate,
+    this.lieblingslehrer,
+    this.lieblingsfaecher,
+    this.lieblingsbeschaeftigung,
+    this.plaene,
+    this.groessterErfolg,
+    this.krassestesErlebnis,
+    this.einzigartigkeit,
+    this.textVonFreunden,
   });
 
-  Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'geburts_datum': geburtsDatum,
-      'freunde': freunde,
-      'zitate': zitate,
-      'lieblingslehrer': lieblingslehrer,
-      'lieblingsfaecher': lieblingsfaecher,
-      'lieblingsbeschaeftigung': lieblingsbeschaeftigung,
-      'plaene': plaene,
-      'groesster_erfolg': groessterErfolg,
-      'krassestes_erlebnis': krassestesErlebnis,
-      'einzigartigkeit': einzigartigkeit,
-      'text_von_freunden': textVonFreunden,
-      'bild_base64': hauptBildBase64,
-      'freunde_bilder_base64': freundeBilderBase64,
-    };
+  factory PreviewModel.fromJson(Map<String, dynamic> json) {
+    return PreviewModel(
+      LoginModel.fromJson(json['login']),
+      hauptBildBase64: json['bild_base64'],
+      geburtsDatum: json['geburts_datum'],
+      freunde:
+          json['freunde'] != null ? List<String>.from(json['freunde']) : null,
+      freundeBilderBase64: json['freunde_bilder_base64'] != null
+          ? List<String>.from(json['freunde_bilder_base64'])
+          : null,
+      zitate: json['zitate'] != null ? List<String>.from(json['zitate']) : null,
+      lieblingslehrer: json['lieblingslehrer'],
+      lieblingsfaecher: json['lieblingsfaecher'],
+      lieblingsbeschaeftigung: json['lieblingsbeschaeftigung'],
+      plaene: json['plaene'],
+      groessterErfolg: json['groesster_erfolg'],
+      krassestesErlebnis: json['krassestes_erlebnis'],
+      einzigartigkeit: json['einzigartigkeit'],
+      textVonFreunden: json['text_von_freunden'],
+    );
   }
+
+  Map<String, dynamic> toJson() => {
+        'login': login.toJson(),
+        'geburts_datum': geburtsDatum,
+        'freunde': freunde,
+        'zitate': zitate,
+        'lieblingslehrer': lieblingslehrer,
+        'lieblingsfaecher': lieblingsfaecher,
+        'lieblingsbeschaeftigung': lieblingsbeschaeftigung,
+        'plaene': plaene,
+        'groesster_erfolg': groessterErfolg,
+        'krassestes_erlebnis': krassestesErlebnis,
+        'einzigartigkeit': einzigartigkeit,
+        'text_von_freunden': textVonFreunden,
+        'bild_base64': hauptBildBase64,
+        'freunde_bilder_base64': freundeBilderBase64,
+      };
 }

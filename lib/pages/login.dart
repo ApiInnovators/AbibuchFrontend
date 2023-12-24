@@ -89,14 +89,20 @@ class _LoginPageState extends State<LoginPage> {
 
     setState(() => isLoggingIn = true);
     final name = nameController.text.trim();
+    final password = passwordController.text.trim();
+    final login = LoginModel(name: name, password: password);
 
-    final resp = await Api.login(name, passwordController.text);
+    final resp = await Api.login(login);
 
     if (resp.statusCode == 200 && mounted) {
+      final decoded = jsonDecode(resp.body);
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => EditPage(userName: name),
+          builder: (context) => EditPage(
+            login: login,
+            lastSubmittedData: PreviewModel.fromJson(decoded),
+          ),
         ),
       );
     } else if (mounted) {

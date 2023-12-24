@@ -2,273 +2,117 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:hgv_abibuch/pages/panel_inputs/generell.dart';
+import 'package:hgv_abibuch/pages/panel_inputs/panel1.dart';
+import 'package:hgv_abibuch/pages/panel_inputs/panel2.dart';
+import 'package:hgv_abibuch/pages/panel_inputs/panel3.dart';
+import 'package:hgv_abibuch/pages/panel_inputs/panel4.dart';
 import 'package:hgv_abibuch/pages/preview.dart';
 import 'package:image_picker_web/image_picker_web.dart';
-import 'package:intl/intl.dart';
 
 import '../api/api.dart';
 
 class EditPage extends StatelessWidget {
-  final _formKey = GlobalKey<FormState>();
-  final String userName;
+  final LoginModel login;
+  final PreviewModel? lastSubmittedData;
 
-  EditPage({super.key, required this.userName});
+  const EditPage({
+    super.key,
+    required this.login,
+    required this.lastSubmittedData,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final inputWidget = InputWidget(formKey: _formKey, userName: userName);
+    final inputWidget = InputWidget(
+      login: login,
+      lastSubmittedData: lastSubmittedData,
+      onPreview: (PreviewModel data) => Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PreviewPage(inputData: data),
+        ),
+      ),
+    );
     return Scaffold(
       appBar: AppBar(title: const Text("Bearbeiten")),
-      body: Column(
-        children: [
-          Expanded(child: inputWidget),
-          ElevatedButton(
-            onPressed: () {
-              if (!_formKey.currentState!.validate() && !kDebugMode) return;
-
-              final gen = inputWidget.generateData();
-
-              if (gen.$1 == null) {
-                ScaffoldMessenger.of(context)
-                    .showSnackBar(SnackBar(content: Text(gen.$2)));
-                return;
-              }
-
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => PreviewPage(
-                    inputData: gen.$1!,
-                  ),
-                ),
-              );
-            },
-            child: const Text("Vorschau"),
-          ),
-        ],
-      ),
+      body: inputWidget,
     );
   }
 }
 
-class InputWidget extends StatelessWidget {
-  final GlobalKey<FormState> formKey;
-  final DateFormat dateFormat = DateFormat("dd.MM.yyyy");
+class InputWidget extends StatefulWidget {
+  final LoginModel login;
+  final PreviewModel? lastSubmittedData;
 
-  final panel2inputs = [
-    Input(
-        prompt: const Text("Name von Freund 1"),
-        hintText: 'Max',
-        maxLength: 16),
-    Input(
-        prompt: const Text("Zitat von Freund 1"),
-        hintText: 'Immer für jede Party zu haben',
-        maxLength: 90),
-    Input(
-        prompt: const Text("Name von Freund 2"),
-        hintText: 'Anna',
-        maxLength: 16),
-    Input(
-        prompt: const Text("Zitat von Freund 2"),
-        hintText: 'Die Legende',
-        maxLength: 90),
-    Input(
-        prompt: const Text("Name von Freund 3"),
-        hintText: 'Tom',
-        maxLength: 16),
-    Input(
-        prompt: const Text("Zitat von Freund 3"),
-        hintText: 'Es gibt niemand besseren auf der Welt',
-        maxLength: 90),
-    Input(
-        prompt: const Text("Name von Freund 4"),
-        hintText: 'Lisa',
-        maxLength: 16),
-    Input(
-        prompt: const Text("Zitat von Freund 4"),
-        hintText: 'Chaotic Neutral',
-        maxLength: 90),
-  ];
+  final void Function(PreviewModel data) onPreview;
 
-  final panel2ImgInputs = [
-    ImageInput(
-      height: 100,
-      aspectRatio: 1 / 1,
-      prompt: "Foto von Freund 1 auswählen",
-    ),
-    ImageInput(
-      height: 100,
-      aspectRatio: 1 / 1,
-      prompt: "Foto von Freund 2 auswählen",
-    ),
-    ImageInput(
-      height: 100,
-      aspectRatio: 1 / 1,
-      prompt: "Foto von Freund 3 auswählen",
-    ),
-    ImageInput(
-      height: 100,
-      aspectRatio: 1 / 1,
-      prompt: "Foto von Freund 4 auswählen",
-    ),
-  ];
+  const InputWidget({
+    super.key,
+    required this.login,
+    required this.lastSubmittedData,
+    required this.onPreview,
+  });
 
-  final panel3Inputs = [
-    Input(
-      prompt: const Text("Lieblingslehrer"),
-      hintText: "Herr X",
-      maxLength: 26,
-    ),
-    Input(
-      prompt: const Text("Lieblingsfächer"),
-      hintText: "Mathe, Deutsch und Englisch",
-      maxLength: 26,
-    ),
-    Input(
-      prompt: const Text("Lieblingsbeschäftigung"),
-      hintText: "Essen",
-      maxLength: 26,
-    ),
-    Input(
-      prompt: const Text("Pläne nach dem Abi"),
-      hintText: "Astrobotanik studieren",
-      maxLength: 26,
-    ),
-    Input(
-      prompt: const Text("Größter außerschulischer Erfolg"),
-      hintText: "Meine Geburt",
-      maxLength: 26,
-    ),
-    Input(
-      prompt: const Text("Krassestes Unterrichtserlebnis"),
-      hintText: "Toilette ist explodiert",
-      maxLength: 26,
-    ),
-    Input(
-      prompt: const Text("Was mich einzigartig macht"),
-      hintText: "Niemand kann bessere Kekse backen als Ich!",
-      maxLength: 78,
-    ),
-  ];
+  @override
+  State<InputWidget> createState() => _InputWidgetState();
+}
 
-  Input? birthdateInput;
-  final ImageInput mainImageInput = ImageInput(
-    height: 300,
-    aspectRatio: 3 / 4,
-    prompt: "Ein Bild von dir",
+class _InputWidgetState extends State<InputWidget> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  late final GenerellPanelWidget generellInput = GenerellPanelWidget(
+    lastData: widget.lastSubmittedData,
+    login: widget.login,
   );
-
-  final String userName;
-
-  late final Input textVonFreundenInput;
-
-  InputWidget({super.key, required this.formKey, required this.userName}) {
-    final firstName = userName.split(" ")[0];
-
-    textVonFreundenInput = Input(
-      prompt: const Text("Text von Freunden"),
-      hintText:
-          "$firstName ist manchmal ein wenig tollpatschig, aber genau das macht ihn auf eine liebenswerte Weise einzigartig...",
-      maxLength: 750,
-    );
-  }
+  late final Panel1Widget panel1Input =
+      Panel1Widget(lastData: widget.lastSubmittedData);
+  late final Panel2Widget panel2Input = Panel2Widget(
+    lastData: widget.lastSubmittedData,
+    login: widget.login,
+  );
+  late final Panel3Widget panel3Input =
+      Panel3Widget(lastData: widget.lastSubmittedData);
+  late final Panel4Widget panel4Input = Panel4Widget(
+    login: widget.login,
+    lastData: widget.lastSubmittedData,
+  );
 
   @override
   Widget build(BuildContext context) {
-    birthdateInput ??= Input(
-      prompt: const Text("Dein Geburtsdatum"),
-      hintText: "06.09.2006",
-      maxLength: 10,
-      suffix: IconButton(
-          icon: const Icon(Icons.calendar_month),
-          onPressed: () async {
-            final selectedDate = await showDatePicker(
-              context: context,
-              firstDate: DateTime(2000),
-              lastDate: DateTime(2010),
-            );
-            if (selectedDate == null) return;
-            birthdateInput!._controller.text = dateFormat.format(selectedDate);
-          }),
-      additionalValidator: (value) {
-        if (dateFormat.tryParse(value) == null) return "Ungültiges Datum";
-        return null;
-      },
-    );
-
     return Form(
-      key: formKey,
+      key: _formKey,
       child: SingleChildScrollView(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Card(
-              color: Theme.of(context).colorScheme.tertiaryContainer,
-              child: Column(
-                children: [
-                  const ListTile(
-                    title: Text("Über dich"),
-                    titleTextStyle:
-                        TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-                  ),
-                  mainImageInput,
-                  const SizedBox(height: 10),
-                  birthdateInput!,
-                ],
-              ),
-            ),
-            Card(
-              color: Theme.of(context).colorScheme.tertiaryContainer,
-              child: Column(children: [
-                const ListTile(
-                  title: Text("Panel 2"),
-                  titleTextStyle:
-                      TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+            generellInput,
+            panel1Input,
+            panel2Input,
+            panel3Input,
+            panel4Input,
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              child: SizedBox(
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: () {
+                    if (!_formKey.currentState!.validate() && !kDebugMode) {
+                      return;
+                    }
+
+                    final gen = generateData();
+
+                    if (gen.$1 == null) {
+                      ScaffoldMessenger.of(context)
+                          .showSnackBar(SnackBar(content: Text(gen.$2)));
+                      return;
+                    }
+
+                    widget.onPreview(gen.$1!);
+                  },
+                  child: const Text("Vorschau"),
                 ),
-                for (int i = 0; i < panel2inputs.length; i += 2) ...[
-                  Card(
-                    color: const Color.fromARGB(255, 178, 205, 238),
-                    child: Column(
-                      children: [
-                        ListTile(
-                          title: Text(
-                            "Freund ${i / 2 + 1}",
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        panel2ImgInputs[i ~/ 2],
-                        const SizedBox(height: 10),
-                        panel2inputs[i],
-                        panel2inputs[i + 1],
-                      ],
-                    ),
-                  ),
-                ],
-              ]),
-            ),
-            Card(
-              color: Theme.of(context).colorScheme.tertiaryContainer,
-              child: Column(
-                children: [
-                  const ListTile(
-                    title: Text("Panel 3"),
-                    titleTextStyle:
-                        TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-                  ),
-                  for (final input in panel3Inputs) input,
-                ],
-              ),
-            ),
-            Card(
-              color: Theme.of(context).colorScheme.tertiaryContainer,
-              child: Column(
-                children: [
-                  const ListTile(
-                    title: Text("Panel 4"),
-                    titleTextStyle:
-                        TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-                  ),
-                  textVonFreundenInput,
-                ],
               ),
             ),
           ],
@@ -278,49 +122,15 @@ class InputWidget extends StatelessWidget {
   }
 
   (PreviewModel? data, String error) generateData() {
-    List<String> freunde = List.empty(growable: true);
-    List<String> zitate = List.empty(growable: true);
-    List<String> freundeBilder = List.empty(growable: true);
-
-    for (int i = 0; i < panel2inputs.length; i += 2) {
-      freunde.add(panel2inputs[i].getInput());
-      zitate.add(panel2inputs[i + 1].getInput());
-      final img = panel2ImgInputs[i ~/ 2].state.getBase64();
-      if (img == null) {
-        return (null, "Kein Bild von Freund ${i ~/ 2 + 1} vorhanden");
-      }
-      freundeBilder.add(img);
-    }
-
-    if (dateFormat.tryParse(birthdateInput!.getInput()) == null) {
-      return (null, "Ungültiges Geburtsdatumformat");
-    }
-
-    final mainImg = mainImageInput.state.getBase64();
-
-    if (mainImg == null) {
-      return (null, "Kein Bild von dir vorhanden");
-    }
-
-    return (
-      PreviewModel(
-        name: userName,
-        geburtsDatum: birthdateInput!.getInput(),
-        freunde: freunde,
-        zitate: zitate,
-        lieblingslehrer: panel3Inputs[0].getInput(),
-        lieblingsfaecher: panel3Inputs[1].getInput(),
-        lieblingsbeschaeftigung: panel3Inputs[2].getInput(),
-        plaene: panel3Inputs[3].getInput(),
-        groessterErfolg: panel3Inputs[4].getInput(),
-        krassestesErlebnis: panel3Inputs[5].getInput(),
-        einzigartigkeit: panel3Inputs[6].getInput(),
-        textVonFreunden: textVonFreundenInput.getInput(),
-        freundeBilderBase64: freundeBilder,
-        hauptBildBase64: mainImg,
-      ),
-      ""
-    );
+    final preview = PreviewModel(widget.login);
+    String? error;
+    error ??= generellInput.fillPreview(preview);
+    error ??= panel1Input.fillPreview(preview);
+    error ??= panel2Input.fillPreview(preview);
+    panel3Input.fillPreview(preview);
+    panel4Input.fillPreview(preview);
+    if (error != null) return (null, error);
+    return (preview, "");
   }
 }
 
@@ -328,9 +138,10 @@ class Input extends StatelessWidget {
   final Widget prompt;
   final String hintText;
   final int maxLength;
-  final _controller = TextEditingController();
+  final controller = TextEditingController();
   final Widget? suffix;
   final String? Function(String value)? additionalValidator;
+  final String? initialValue;
 
   Input({
     super.key,
@@ -339,68 +150,95 @@ class Input extends StatelessWidget {
     required this.maxLength,
     this.suffix,
     this.additionalValidator,
-  });
+    this.initialValue,
+  }) {
+    if (initialValue != null) controller.text = initialValue!;
+  }
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
-      controller: _controller,
-      maxLength: maxLength,
-      decoration: InputDecoration(
-        border: const OutlineInputBorder(),
-        label: prompt,
-        hintText: hintText,
-        suffixIcon: suffix,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      child: TextFormField(
+        controller: controller,
+        maxLength: maxLength,
+        decoration: InputDecoration(
+          border: const OutlineInputBorder(),
+          label: prompt,
+          hintText: hintText,
+          suffixIcon: suffix,
+        ),
+        validator: (value) {
+          if (value == null || value.trim().isEmpty) {
+            return "Bitte gib hier etwas ein";
+          }
+          if (additionalValidator != null) {
+            return additionalValidator!(value);
+          }
+          return null;
+        },
       ),
-      validator: (value) {
-        if (value == null || value.trim().isEmpty) {
-          return "Bitte gib hier etwas ein";
-        }
-        if (additionalValidator != null) {
-          return additionalValidator!(value);
-        }
-        return null;
-      },
     );
   }
 
-  String getInput() => _controller.text;
+  String getInput() => controller.text;
 }
 
 class ImageInput extends StatefulWidget {
   final String prompt;
   final double height;
   final double aspectRatio;
-  late ImageInputState state;
+  final void Function(String base64Img) base64ImageSelected;
+  final String? initialImage;
 
-  ImageInput({
+  const ImageInput({
     super.key,
     required this.height,
     required this.aspectRatio,
     required this.prompt,
+    required this.base64ImageSelected,
+    this.initialImage,
   });
 
   @override
-  State<ImageInput> createState() {
-    state = ImageInputState();
-    return state;
-  }
+  State<ImageInput> createState() => _ImageInputState();
 }
 
-class ImageInputState extends State<ImageInput> {
+class _ImageInputState extends State<ImageInput> {
   Uint8List? image;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.initialImage != null) {
+      image = base64Decode(widget.initialImage!);
+      widget.base64ImageSelected(base64Encode(image!));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     if (image == null) {
-      return ListTile(
-        title: Text(widget.prompt),
-        trailing: ElevatedButton(
-          onPressed: () async {
-            image = await ImagePickerWeb.getImageAsBytes();
-            if (mounted) setState(() {});
-          },
-          child: const Text("Bild auswählen"),
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+        child: Container(
+          decoration: BoxDecoration(
+              border: Border.all(
+                color: Colors.grey,
+              ),
+              borderRadius: BorderRadius.circular(5)),
+          child: ListTile(
+            title: Text(widget.prompt),
+            trailing: ElevatedButton(
+              onPressed: () async {
+                image = await ImagePickerWeb.getImageAsBytes();
+                if (image == null) return;
+                widget.base64ImageSelected(base64Encode(image!));
+                if (mounted) setState(() {});
+              },
+              child: const Text("Bild auswählen"),
+            ),
+          ),
         ),
       );
     }
@@ -422,16 +260,13 @@ class ImageInputState extends State<ImageInput> {
         ElevatedButton(
           onPressed: () async {
             image = await ImagePickerWeb.getImageAsBytes();
+            if (image == null) return;
+            widget.base64ImageSelected(base64Encode(image!));
             if (mounted) setState(() {});
           },
           child: const Text("Anderes Bild auswählen"),
         ),
       ],
     );
-  }
-
-  String? getBase64() {
-    if (image == null) return null;
-    return base64Encode(image!);
   }
 }
