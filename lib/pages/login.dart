@@ -101,7 +101,8 @@ class _LoginPageState extends State<LoginPage> {
         MaterialPageRoute(
           builder: (context) => EditPage(
             login: login,
-            lastSubmittedData: PreviewModel.fromJson(decoded),
+            lastSubmittedData:
+                decoded == null ? null : PreviewModel.fromJson(decoded),
           ),
         ),
       );
