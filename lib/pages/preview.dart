@@ -48,7 +48,7 @@ class PreviewPage extends StatelessWidget {
                       onPressed: () => download(imgData,
                           "Abibuch ${inputData.login.name}.png", "image/png"),
                       icon: const Icon(Icons.download),
-                      label: const Text("Download Png"),
+                      label: const Text("Als Bild herunterladen"),
                     ),
                   ],
                 ),
