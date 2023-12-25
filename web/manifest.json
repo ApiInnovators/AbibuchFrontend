@@ -1,11 +1,11 @@
 {
-    "name": "hgv_abibuch",
-    "short_name": "hgv_abibuch",
+    "name": "Hgv Abibuch",
+    "short_name": "Hgv Abibuch",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "Erstelle deine Abibuchseite.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
