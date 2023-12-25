@@ -16,7 +16,7 @@ class Api {
     });
     try {
       final baseResp =
-          await client.send(request).timeout(const Duration(seconds: 10));
+          await client.send(request).timeout(const Duration(seconds: 60));
       return Response.fromStream(baseResp);
     } on SocketException {
       return Response("Error", 499);
