@@ -9,7 +9,7 @@ class GenerellPanelWidget extends StatelessWidget {
   Input nameInput = Input(
     prompt: const Text("Dein Name"),
     hintText: "Max Mustermann",
-    maxLength: 17,
+    maxLength: 24,
   );
 
   GenerellPanelWidget({super.key});
