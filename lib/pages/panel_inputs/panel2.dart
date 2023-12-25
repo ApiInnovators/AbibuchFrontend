@@ -11,6 +11,8 @@ class Panel2Widget extends StatelessWidget {
   final PreviewModel? lastData;
   final LoginModel login;
 
+  static const maxZitatLength = 125;
+
   Panel2Widget({super.key, required this.lastData, required this.login}) {
     String name = login.name.split(" ").first;
     inputs.addAll([
@@ -23,7 +25,7 @@ class Panel2Widget extends StatelessWidget {
       Input(
         prompt: const Text("Zitat von Freund 1"),
         hintText: '$name ist immer für eine Party zu haben!',
-        maxLength: 90,
+        maxLength: maxZitatLength,
         initialValue: lastData?.zitate?[0],
       ),
       Input(
@@ -36,7 +38,7 @@ class Panel2Widget extends StatelessWidget {
         prompt: const Text("Zitat von Freund 2"),
         hintText:
             'Wenn sich $name etwas in den Kopf gesetzt hat, kann es niemand aufhalten',
-        maxLength: 90,
+        maxLength: maxZitatLength,
         initialValue: lastData?.zitate?[1],
       ),
       Input(
@@ -48,7 +50,7 @@ class Panel2Widget extends StatelessWidget {
       Input(
         prompt: const Text("Zitat von Freund 3"),
         hintText: 'Es gibt niemand besseren auf der Welt als $name',
-        maxLength: 90,
+        maxLength: maxZitatLength,
         initialValue: lastData?.zitate?[2],
       ),
       Input(
@@ -60,7 +62,7 @@ class Panel2Widget extends StatelessWidget {
       Input(
         prompt: const Text("Zitat von Freund 4"),
         hintText: 'Chaotic Neutral',
-        maxLength: 90,
+        maxLength: maxZitatLength,
         initialValue: lastData?.zitate?[3],
       ),
     ]);

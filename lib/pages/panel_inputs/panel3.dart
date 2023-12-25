@@ -8,48 +8,50 @@ class Panel3Widget extends StatelessWidget {
 
   final PreviewModel? lastData;
 
+  static const maxTextLength = 41;
+
   Panel3Widget({super.key, required this.lastData}) {
     inputs.addAll([
       Input(
         prompt: const Text("Lieblingslehrer"),
         hintText: "Herr X",
-        maxLength: 26,
+        maxLength: maxTextLength,
         initialValue: lastData?.lieblingslehrer,
       ),
       Input(
         prompt: const Text("Lieblingsfächer"),
         hintText: "Mathe, Deutsch und Englisch",
-        maxLength: 26,
+        maxLength: maxTextLength,
         initialValue: lastData?.lieblingsfaecher,
       ),
       Input(
         prompt: const Text("Lieblingsbeschäftigung"),
         hintText: "Essen",
-        maxLength: 26,
+        maxLength: maxTextLength,
         initialValue: lastData?.lieblingsbeschaeftigung,
       ),
       Input(
         prompt: const Text("Pläne nach dem Abi"),
         hintText: "Astrobotanik studieren",
-        maxLength: 26,
+        maxLength: maxTextLength,
         initialValue: lastData?.plaene,
       ),
       Input(
         prompt: const Text("Größter außerschulischer Erfolg"),
         hintText: "Meine Geburt",
-        maxLength: 26,
+        maxLength: maxTextLength,
         initialValue: lastData?.groessterErfolg,
       ),
       Input(
         prompt: const Text("Krassestes Unterrichtserlebnis"),
         hintText: "Toilette ist explodiert",
-        maxLength: 26,
+        maxLength: maxTextLength,
         initialValue: lastData?.krassestesErlebnis,
       ),
       Input(
         prompt: const Text("Was mich einzigartig macht"),
         hintText: "Niemand kann bessere Kekse backen als Ich!",
-        maxLength: 78,
+        maxLength: maxTextLength,
         initialValue: lastData?.einzigartigkeit,
       ),
     ]);

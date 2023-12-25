@@ -36,7 +36,17 @@ class EditPage extends StatelessWidget {
     );
     return Scaffold(
       appBar: AppBar(title: const Text("Bearbeiten")),
-      body: inputWidget,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            inputWidget,
+            const ListTile(
+              leading: Icon(Icons.copyright),
+              title: Text("Finn Drünert 2023"),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -82,41 +92,39 @@ class _InputWidgetState extends State<InputWidget> {
   Widget build(BuildContext context) {
     return Form(
       key: _formKey,
-      child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            generellInput,
-            panel1Input,
-            panel2Input,
-            panel3Input,
-            panel4Input,
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              child: SizedBox(
-                height: 50,
-                child: ElevatedButton(
-                  onPressed: () {
-                    if (!_formKey.currentState!.validate() && !kDebugMode) {
-                      return;
-                    }
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          generellInput,
+          panel1Input,
+          panel2Input,
+          panel3Input,
+          panel4Input,
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: SizedBox(
+              height: 50,
+              child: ElevatedButton(
+                onPressed: () {
+                  if (!_formKey.currentState!.validate() && !kDebugMode) {
+                    return;
+                  }
 
-                    final gen = generateData();
+                  final gen = generateData();
 
-                    if (gen.$1 == null) {
-                      ScaffoldMessenger.of(context)
-                          .showSnackBar(SnackBar(content: Text(gen.$2)));
-                      return;
-                    }
+                  if (gen.$1 == null) {
+                    ScaffoldMessenger.of(context)
+                        .showSnackBar(SnackBar(content: Text(gen.$2)));
+                    return;
+                  }
 
-                    widget.onPreview(gen.$1!);
-                  },
-                  child: const Text("Vorschau"),
-                ),
+                  widget.onPreview(gen.$1!);
+                },
+                child: const Text("Vorschau"),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

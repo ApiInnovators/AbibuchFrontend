@@ -1,13 +1,13 @@
+import 'dart:convert';
+import 'dart:html';
+
 import 'package:flutter/material.dart';
 import 'package:hgv_abibuch/api/api.dart';
 
 class PreviewPage extends StatelessWidget {
   final PreviewModel inputData;
 
-  const PreviewPage({
-    super.key,
-    required this.inputData,
-  });
+  const PreviewPage({super.key, required this.inputData});
 
   @override
   Widget build(BuildContext context) {
@@ -35,9 +35,44 @@ class PreviewPage extends StatelessWidget {
                 "Error: ${snapshot.requireData.statusCode}\n${snapshot.requireData.body}");
           }
 
-          return Center(child: Image.memory(snapshot.requireData.bodyBytes));
+          final imgData = snapshot.requireData.bodyBytes;
+
+          return Column(
+            children: [
+              Expanded(child: Image.memory(imgData)),
+              Center(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ElevatedButton.icon(
+                      onPressed: () => download(imgData,
+                          "Abibuch ${inputData.login.name}.png", "image/png"),
+                      icon: const Icon(Icons.download),
+                      label: const Text("Download Png"),
+                    ),
+                  ],
+                ),
+              ),
+              const ListTile(
+                leading: Icon(Icons.copyright),
+                title: Text("Finn Drünert 2023"),
+              ),
+            ],
+          );
         },
       ),
     );
   }
+}
+
+void download(List<int> bytes, String downloadName, String mimeType) {
+  final base64 = base64Encode(bytes);
+  // Create the link with the file
+  final anchor = AnchorElement(href: 'data:$mimeType;base64,$base64')
+    ..target = 'blank';
+  anchor.download = downloadName;
+  document.body?.append(anchor);
+  anchor.click();
+  anchor.remove();
+  return;
 }
