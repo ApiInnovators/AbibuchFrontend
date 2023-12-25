@@ -51,7 +51,7 @@ class PreviewPage extends StatelessWidget {
                         "image/png",
                       ),
                       icon: const Icon(Icons.download),
-                      label: const Text("Download Png"),
+                      label: const Text("Als Bild herunterladen"),
                     ),
                   ],
                 ),
