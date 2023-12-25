@@ -45,8 +45,11 @@ class PreviewPage extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     ElevatedButton.icon(
-                      onPressed: () => download(imgData,
-                          "Abibuch ${inputData.login.name}.png", "image/png"),
+                      onPressed: () => download(
+                        imgData,
+                        "Abibuchseite von ${inputData.name}.png",
+                        "image/png",
+                      ),
                       icon: const Icon(Icons.download),
                       label: const Text("Download Png"),
                     ),

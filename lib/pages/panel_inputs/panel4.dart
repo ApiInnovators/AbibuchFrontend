@@ -4,20 +4,15 @@ import '../../api/api.dart';
 import '../edit.dart';
 
 class Panel4Widget extends StatelessWidget {
-  final LoginModel login;
-  final PreviewModel? lastData;
 
   late final Input textVonFreundenInput;
 
-  Panel4Widget({super.key, required this.login, required this.lastData}) {
-    final firstName = login.name.split(" ")[0];
-
+  Panel4Widget({super.key}) {
     textVonFreundenInput = Input(
       prompt: const Text("Text von Freunden"),
       hintText:
-          "$firstName ist manchmal ein wenig tollpatschig, aber genau das macht ihn auf eine liebenswerte Weise einzigartig...",
+          "Er/Sie ist manchmal ein wenig tollpatschig, aber genau das macht ihn/sie auf eine liebenswerte Weise einzigartig...",
       maxLength: 36 * 28,
-      initialValue: lastData?.textVonFreunden,
     );
   }
 

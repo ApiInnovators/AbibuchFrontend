@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hgv_abibuch/pages/login.dart';
+import 'package:hgv_abibuch/pages/edit.dart';
 import 'package:intl/intl.dart';
 
 final DateFormat dateFormat = DateFormat("dd.MM.yyyy");
@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: const LoginPage(),
+      home: const EditPage(),
     );
   }
 }

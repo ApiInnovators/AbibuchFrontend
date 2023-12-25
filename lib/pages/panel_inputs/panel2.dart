@@ -8,62 +8,51 @@ class Panel2Widget extends StatelessWidget {
 
   final List<String?> freundeBilderBase64 = [null, null, null, null];
   final imgInputs = List<ImageInput>.empty(growable: true);
-  final PreviewModel? lastData;
-  final LoginModel login;
 
   static const maxZitatLength = 125;
 
-  Panel2Widget({super.key, required this.lastData, required this.login}) {
-    String name = login.name.split(" ").first;
+  Panel2Widget({super.key}) {
     inputs.addAll([
       Input(
         prompt: const Text("Name von Freund 1"),
         hintText: 'Max',
         maxLength: 16,
-        initialValue: lastData?.freunde?[0],
       ),
       Input(
         prompt: const Text("Zitat von Freund 1"),
-        hintText: '$name ist immer für eine Party zu haben!',
+        hintText: 'Er/Sie ist immer für eine Party zu haben!',
         maxLength: maxZitatLength,
-        initialValue: lastData?.zitate?[0],
       ),
       Input(
         prompt: const Text("Name von Freund 2"),
         hintText: 'Anna',
         maxLength: 16,
-        initialValue: lastData?.freunde?[1],
       ),
       Input(
         prompt: const Text("Zitat von Freund 2"),
         hintText:
-            'Wenn sich $name etwas in den Kopf gesetzt hat, kann es niemand aufhalten',
+            'Wenn er/sie sich etwas in den Kopf gesetzt hat, kann es niemand aufhalten',
         maxLength: maxZitatLength,
-        initialValue: lastData?.zitate?[1],
       ),
       Input(
         prompt: const Text("Name von Freund 3"),
         hintText: 'Tom',
         maxLength: 16,
-        initialValue: lastData?.freunde?[2],
       ),
       Input(
         prompt: const Text("Zitat von Freund 3"),
-        hintText: 'Es gibt niemand besseren auf der Welt als $name',
+        hintText: 'Es gibt niemand besseren auf der Welt.',
         maxLength: maxZitatLength,
-        initialValue: lastData?.zitate?[2],
       ),
       Input(
         prompt: const Text("Name von Freund 4"),
         hintText: 'Lisa',
         maxLength: 16,
-        initialValue: lastData?.freunde?[3],
       ),
       Input(
         prompt: const Text("Zitat von Freund 4"),
         hintText: 'Chaotic Neutral',
         maxLength: maxZitatLength,
-        initialValue: lastData?.zitate?[3],
       ),
     ]);
     imgInputs.addAll(
@@ -75,7 +64,6 @@ class Panel2Widget extends StatelessWidget {
           prompt: "Bild von Freund ${i + 1} (Format: 1:1)",
           base64ImageSelected: (base64Img) =>
               freundeBilderBase64[i] = base64Img,
-          initialImage: lastData?.freundeBilderBase64?[i],
         ),
       ),
     );

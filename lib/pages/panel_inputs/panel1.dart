@@ -5,9 +5,8 @@ import '../edit.dart';
 
 class Panel1Widget extends StatelessWidget {
   String? mainImageBase64;
-  final PreviewModel? lastData;
 
-  Panel1Widget({super.key, required this.lastData});
+  Panel1Widget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +21,6 @@ class Panel1Widget extends StatelessWidget {
             ),
           ),
           ImageInput(
-            initialImage: lastData?.hauptBildBase64,
             height: 300,
             aspectRatio: 3 / 4,
             prompt: "Ein Bild von dir (Format: 3:4)",

@@ -5,11 +5,14 @@ import '../../main.dart';
 import '../edit.dart';
 
 class GenerellPanelWidget extends StatelessWidget {
-  final PreviewModel? lastData;
-  final LoginModel login;
   Input? birthdateInput;
+  Input nameInput = Input(
+    prompt: const Text("Dein Name"),
+    hintText: "Max Mustermann",
+    maxLength: 17,
+  );
 
-  GenerellPanelWidget({super.key, required this.lastData, required this.login});
+  GenerellPanelWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +20,6 @@ class GenerellPanelWidget extends StatelessWidget {
       prompt: const Text("Dein Geburtsdatum"),
       hintText: "06.09.2006",
       maxLength: 10,
-      initialValue: lastData?.geburtsDatum,
       suffix: IconButton(
           icon: const Icon(Icons.calendar_month),
           onPressed: () async {
@@ -45,8 +47,7 @@ class GenerellPanelWidget extends StatelessWidget {
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
             ),
           ),
-          ListTile(title: Text("Name: ${login.name}")),
-          const SizedBox(height: 10),
+          nameInput,
           birthdateInput!,
         ],
       ),
@@ -54,6 +55,7 @@ class GenerellPanelWidget extends StatelessWidget {
   }
 
   String? fillPreview(PreviewModel preview) {
+    preview.name = nameInput.getInput();
     if (dateFormat.tryParse(birthdateInput!.getInput()) == null) {
       return "Ungültiges Geburtsdatumformat";
     }

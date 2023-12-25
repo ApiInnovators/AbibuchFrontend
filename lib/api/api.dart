@@ -25,12 +25,6 @@ class Api {
     }
   }
 
-  static Future<Response> login(LoginModel login) {
-    final req = Request("POST", Uri.parse("$baseUrl/login"));
-    req.body = jsonEncode(login.toJson());
-    return _handleRequest(req);
-  }
-
   static Future<Response> preview(PreviewModel data) async {
     final req = Request("POST", Uri.parse("$baseUrl/preview"));
     req.body = jsonEncode(data.toJson());
@@ -38,20 +32,8 @@ class Api {
   }
 }
 
-class LoginModel {
-  final String name;
-  final String password;
-
-  const LoginModel({required this.name, required this.password});
-
-  factory LoginModel.fromJson(Map<String, dynamic> json) =>
-      LoginModel(name: json["name"]!, password: json["password"]!);
-
-  Map<String, dynamic> toJson() => {"name": name, "password": password};
-}
-
 class PreviewModel {
-  LoginModel login;
+  String? name;
   String? hauptBildBase64;
   String? geburtsDatum;
   List<String>? freunde;
@@ -66,8 +48,8 @@ class PreviewModel {
   String? einzigartigkeit;
   String? textVonFreunden;
 
-  PreviewModel(
-    this.login, {
+  PreviewModel({
+    this.name,
     this.hauptBildBase64,
     this.geburtsDatum,
     this.freunde,
@@ -85,7 +67,7 @@ class PreviewModel {
 
   factory PreviewModel.fromJson(Map<String, dynamic> json) {
     return PreviewModel(
-      LoginModel.fromJson(json['login']),
+      name: json["name"],
       hauptBildBase64: json['bild_base64'],
       geburtsDatum: json['geburts_datum'],
       freunde:
@@ -106,7 +88,7 @@ class PreviewModel {
   }
 
   Map<String, dynamic> toJson() => {
-        'login': login.toJson(),
+        'name': name,
         'geburts_datum': geburtsDatum,
         'freunde': freunde,
         'zitate': zitate,
