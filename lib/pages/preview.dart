@@ -35,25 +35,22 @@ class _PreviewPageState extends State<PreviewPage> {
 
   @override
   Widget build(BuildContext context) {
+    final totalProgress = (sendProgress + receiveProgress) / 2;
     return Scaffold(
-      appBar: AppBar(title: const Text("Vorschau")),
+      appBar: AppBar(
+        bottom: totalProgress == 1
+            ? null
+            : PreferredSize(
+                preferredSize: const Size.fromHeight(4),
+                child: LinearProgressIndicator(value: totalProgress),
+              ),
+        title: const Text("Vorschau"),
+      ),
       body: FutureBuilder(
         future: previewData,
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
-            double totalProgress = (sendProgress + receiveProgress) / 2;
-            return Center(
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Text("Lade Vorschau..."),
-                  const SizedBox(width: 10),
-                  CircularProgressIndicator(
-                    value: totalProgress == 0 ? null : totalProgress,
-                  ),
-                ],
-              ),
-            );
+            return const Center(child: Text("Lade Vorschau..."));
           }
           if (snapshot.hasError) return const Text("Error");
 
