@@ -79,6 +79,12 @@ class _InputWidgetState extends State<InputWidget> {
               child: ElevatedButton(
                 onPressed: () {
                   if (!_formKey.currentState!.validate() && !kDebugMode) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                            "Es wurden noch nicht alle Felder ausgefüllt."),
+                      ),
+                    );
                     return;
                   }
 
