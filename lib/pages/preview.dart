@@ -1,29 +1,56 @@
 import 'dart:convert';
 import 'dart:html';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:hgv_abibuch/api/api.dart';
 
-class PreviewPage extends StatelessWidget {
+class PreviewPage extends StatefulWidget {
   final PreviewModel inputData;
 
   const PreviewPage({super.key, required this.inputData});
+
+  @override
+  State<PreviewPage> createState() => _PreviewPageState();
+}
+
+class _PreviewPageState extends State<PreviewPage> {
+  late Future<Response> previewData;
+  double sendProgress = 0;
+  double receiveProgress = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    previewData = Api.preview(
+      widget.inputData,
+      onReceiveProgress: (count, total) {
+        setState(() => receiveProgress = count / total);
+      },
+      onSendProgress: (count, total) {
+        setState(() => sendProgress = count / total);
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Vorschau")),
       body: FutureBuilder(
-        future: Api.preview(inputData),
+        future: previewData,
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
-            return const Center(
+            double totalProgress = (sendProgress + receiveProgress) / 2;
+            return Center(
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text("Lade Vorschau..."),
-                  SizedBox(width: 10),
-                  CircularProgressIndicator(),
+                  const Text("Lade Vorschau..."),
+                  const SizedBox(width: 10),
+                  CircularProgressIndicator(
+                    value: totalProgress == 0 ? null : totalProgress,
+                  ),
                 ],
               ),
             );
@@ -31,11 +58,14 @@ class PreviewPage extends StatelessWidget {
           if (snapshot.hasError) return const Text("Error");
 
           if (snapshot.requireData.statusCode != 200) {
-            return Text(
-                "Error: ${snapshot.requireData.statusCode}\n${snapshot.requireData.body}");
+            return Center(
+              child: Text(
+                "Error: ${snapshot.requireData.statusCode}\n${snapshot.requireData.data}",
+              ),
+            );
           }
 
-          final imgData = snapshot.requireData.bodyBytes;
+          final imgData = snapshot.requireData.data;
 
           return Column(
             children: [
@@ -47,7 +77,7 @@ class PreviewPage extends StatelessWidget {
                     ElevatedButton.icon(
                       onPressed: () => download(
                         imgData,
-                        "Abibuchseite von ${inputData.name}.png",
+                        "Abibuchseite von ${widget.inputData.name}.png",
                         "image/png",
                       ),
                       icon: const Icon(Icons.download),

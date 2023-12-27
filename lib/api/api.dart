@@ -1,34 +1,88 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
-import 'package:http/http.dart';
+import 'package:dio/dio.dart';
 
 class Api {
-  static final client = Client();
-  static const baseUrl = "https://abibuch.apiinnovators.de";
+  static final Dio _dio = Dio(
+    BaseOptions(
+      baseUrl: "https://abibuch.apiinnovators.de",
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        'Content-Type': 'application/json',
+        'Accept': '*/*',
+      },
+      sendTimeout: const Duration(minutes: 5),
+      receiveTimeout: const Duration(minutes: 5),
+      connectTimeout: const Duration(seconds: 20),
+    ),
+  );
 
-  static Future<Response> _handleRequest(BaseRequest request) async {
-    request.headers.addAll({
-      "Access-Control-Allow-Origin": "*",
-      'Content-Type': 'application/json',
-      'Accept': '*/*'
-    });
+  static Future<Response> _handleRequest(RequestOptions options) async {
     try {
-      final baseResp =
-          await client.send(request).timeout(const Duration(seconds: 60));
-      return Response.fromStream(baseResp);
-    } on SocketException {
-      return Response("Error", 499);
-    } on TimeoutException {
-      return Response("Timeout", HttpStatus.requestTimeout);
+      final response = await _dio.request(
+        options.path,
+        data: options.data,
+        cancelToken: options.cancelToken,
+        onReceiveProgress: options.onReceiveProgress,
+        onSendProgress: options.onSendProgress,
+        options: Options(
+          method: options.method,
+          responseType: options.responseType,
+        ),
+      );
+      return response;
+    } on DioException catch (e) {
+      if (e.type == DioExceptionType.connectionError) {
+        return Response(
+          data: "Verbindungsfehler, überprüfe deine Internetverbindung!",
+          statusCode: HttpStatus.connectionClosedWithoutResponse,
+          requestOptions: options,
+        );
+      } else if (e.type == DioExceptionType.connectionTimeout) {
+        return Response(
+          data: "Zeitüberschreitung bei Verbindungsaufbau.",
+          statusCode: HttpStatus.networkConnectTimeoutError,
+          requestOptions: options,
+        );
+      } else if (e.type == DioExceptionType.receiveTimeout) {
+        return Response(
+          data:
+              "Zeitüberschreitung beim Empfang der Datei, bzw. dein Internet ist zu langsam.",
+          statusCode: HttpStatus.requestTimeout,
+          requestOptions: options,
+        );
+      } else if (e.type == DioExceptionType.sendTimeout) {
+        return Response(
+          data:
+              "Zeitüberschreitung beim Senden der Datei. Du hast entweder eine langsame Internetverbindung oder deine Bilder sind zu groß.",
+          statusCode: HttpStatus.requestTimeout,
+          requestOptions: options,
+        );
+      } else {
+        return Response(
+          data: "$e",
+          statusCode: 499,
+          requestOptions: options,
+        );
+      }
     }
   }
 
-  static Future<Response> preview(PreviewModel data) async {
-    final req = Request("POST", Uri.parse("$baseUrl/preview"));
-    req.body = jsonEncode(data.toJson());
-    return _handleRequest(req);
+  static Future<Response> preview(
+    PreviewModel data, {
+    void Function(int count, int total)? onSendProgress,
+    void Function(int count, int total)? onReceiveProgress,
+  }) async {
+    final options = RequestOptions(
+      path: "/preview",
+      method: "POST",
+      data: data.toJson(),
+      responseType: ResponseType.bytes,
+      onSendProgress: onSendProgress,
+      onReceiveProgress: onReceiveProgress,
+    );
+    return _handleRequest(options);
   }
 }
 
