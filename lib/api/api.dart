@@ -47,6 +47,7 @@ class PreviewModel {
   String? krassestesErlebnis;
   String? einzigartigkeit;
   String? textVonFreunden;
+  String? babyBildBase64;
 
   PreviewModel({
     this.name,
@@ -63,6 +64,7 @@ class PreviewModel {
     this.krassestesErlebnis,
     this.einzigartigkeit,
     this.textVonFreunden,
+    this.babyBildBase64,
   });
 
   factory PreviewModel.fromJson(Map<String, dynamic> json) {
@@ -84,6 +86,7 @@ class PreviewModel {
       krassestesErlebnis: json['krassestes_erlebnis'],
       einzigartigkeit: json['einzigartigkeit'],
       textVonFreunden: json['text_von_freunden'],
+      babyBildBase64: json['baby_bild_base64'],
     );
   }
 
@@ -102,5 +105,6 @@ class PreviewModel {
         'text_von_freunden': textVonFreunden,
         'bild_base64': hauptBildBase64,
         'freunde_bilder_base64': freundeBilderBase64,
+        'baby_bild_base64': babyBildBase64,
       };
 }
