@@ -6,7 +6,7 @@ import '../edit.dart';
 class Panel3Widget extends StatelessWidget {
   final inputs = List<Input>.empty(growable: true);
 
-  static const maxTextLength = 41;
+  static const maxTextLength = 42;
 
   Panel3Widget({super.key}) {
     inputs.addAll([

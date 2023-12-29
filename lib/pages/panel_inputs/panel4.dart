@@ -12,7 +12,7 @@ class Panel4Widget extends StatelessWidget {
       prompt: const Text("Text von Freunden"),
       hintText:
           "Er/Sie ist manchmal ein wenig tollpatschig, aber genau das macht ihn/sie auf eine liebenswerte Weise einzigartig...",
-      maxLength: 36 * 28,
+      maxLength: 44 * 27,
     );
   }
 

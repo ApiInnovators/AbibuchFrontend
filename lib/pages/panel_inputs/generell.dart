@@ -9,7 +9,7 @@ class GenerellPanelWidget extends StatelessWidget {
   Input nameInput = Input(
     prompt: const Text("Dein Name"),
     hintText: "Max Mustermann",
-    maxLength: 24,
+    maxLength: 32,
   );
 
   GenerellPanelWidget({super.key});
@@ -18,8 +18,8 @@ class GenerellPanelWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     birthdateInput ??= Input(
       prompt: const Text("Dein Geburtsdatum"),
-      hintText: "06.09.2006",
-      maxLength: 10,
+      hintText: "06.09.06",
+      maxLength: 8,
       suffix: IconButton(
           icon: const Icon(Icons.calendar_month),
           onPressed: () async {

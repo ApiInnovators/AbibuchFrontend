@@ -102,6 +102,9 @@ class PreviewModel {
   String? einzigartigkeit;
   String? textVonFreunden;
   String? babyBildBase64;
+  String? lehrerBildBase64;
+  String? lehrerName;
+  String? lehrerZitat;
 
   PreviewModel({
     this.name,
@@ -119,6 +122,9 @@ class PreviewModel {
     this.einzigartigkeit,
     this.textVonFreunden,
     this.babyBildBase64,
+    this.lehrerBildBase64,
+    this.lehrerName,
+    this.lehrerZitat,
   });
 
   factory PreviewModel.fromJson(Map<String, dynamic> json) {
@@ -141,6 +147,9 @@ class PreviewModel {
       einzigartigkeit: json['einzigartigkeit'],
       textVonFreunden: json['text_von_freunden'],
       babyBildBase64: json['baby_bild_base64'],
+      lehrerBildBase64: json['lehrer_bild_base64'],
+      lehrerName: json['lehrer_name'],
+      lehrerZitat: json['lehrer_zitat'],
     );
   }
 
@@ -160,5 +169,8 @@ class PreviewModel {
         'bild_base64': hauptBildBase64,
         'freunde_bilder_base64': freundeBilderBase64,
         'baby_bild_base64': babyBildBase64,
+        "lehrer_bild_base64": lehrerBildBase64,
+        "lehrer_name": lehrerName,
+        "lehrer_zitat": lehrerZitat,
       };
 }

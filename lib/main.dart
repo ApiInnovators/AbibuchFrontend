@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hgv_abibuch/pages/edit.dart';
 import 'package:intl/intl.dart';
 
-final DateFormat dateFormat = DateFormat("dd.MM.yyyy");
+final DateFormat dateFormat = DateFormat("dd.MM.yy");
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
