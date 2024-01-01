@@ -11,7 +11,7 @@ class Panel2Widget extends StatelessWidget {
   String? lehrerBildBase64;
 
   static const maxZitatLength = 200;
-  static const maxFriendNameLength = 40;
+  static const maxFriendNameLength = 37;
 
   var lehrerNameInput = Input(
     prompt: const Text("Lehrer Name"),
