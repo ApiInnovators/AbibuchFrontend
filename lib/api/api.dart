@@ -1,57 +1,93 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
-import 'package:http/http.dart';
+import 'package:dio/dio.dart';
 
 class Api {
-  static final client = Client();
-  static const baseUrl = "https://abibuch.apiinnovators.de";
+  static final Dio _dio = Dio(
+    BaseOptions(
+      baseUrl: "https://abibuch.apiinnovators.de",
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        'Content-Type': 'application/json',
+        'Accept': '*/*',
+      },
+      sendTimeout: const Duration(minutes: 5),
+      receiveTimeout: const Duration(minutes: 5),
+      connectTimeout: const Duration(seconds: 20),
+    ),
+  );
 
-  static Future<Response> _handleRequest(BaseRequest request) async {
-    request.headers.addAll({
-      "Access-Control-Allow-Origin": "*",
-      'Content-Type': 'application/json',
-      'Accept': '*/*'
-    });
+  static Future<Response> _handleRequest(RequestOptions options) async {
     try {
-      final baseResp =
-          await client.send(request).timeout(const Duration(seconds: 60));
-      return Response.fromStream(baseResp);
-    } on SocketException {
-      return Response("Error", 499);
-    } on TimeoutException {
-      return Response("Timeout", HttpStatus.requestTimeout);
+      final response = await _dio.request(
+        options.path,
+        data: options.data,
+        cancelToken: options.cancelToken,
+        onReceiveProgress: options.onReceiveProgress,
+        onSendProgress: options.onSendProgress,
+        options: Options(
+          method: options.method,
+          responseType: options.responseType,
+        ),
+      );
+      return response;
+    } on DioException catch (e) {
+      if (e.type == DioExceptionType.connectionError) {
+        return Response(
+          data: "Verbindungsfehler, überprüfe deine Internetverbindung!",
+          statusCode: HttpStatus.connectionClosedWithoutResponse,
+          requestOptions: options,
+        );
+      } else if (e.type == DioExceptionType.connectionTimeout) {
+        return Response(
+          data: "Zeitüberschreitung bei Verbindungsaufbau.",
+          statusCode: HttpStatus.networkConnectTimeoutError,
+          requestOptions: options,
+        );
+      } else if (e.type == DioExceptionType.receiveTimeout) {
+        return Response(
+          data:
+              "Zeitüberschreitung beim Empfang der Datei, bzw. dein Internet ist zu langsam.",
+          statusCode: HttpStatus.requestTimeout,
+          requestOptions: options,
+        );
+      } else if (e.type == DioExceptionType.sendTimeout) {
+        return Response(
+          data:
+              "Zeitüberschreitung beim Senden der Datei. Du hast entweder eine langsame Internetverbindung oder deine Bilder sind zu groß.",
+          statusCode: HttpStatus.requestTimeout,
+          requestOptions: options,
+        );
+      } else {
+        return Response(
+          data: "$e",
+          statusCode: 499,
+          requestOptions: options,
+        );
+      }
     }
   }
 
-  static Future<Response> login(LoginModel login) {
-    final req = Request("POST", Uri.parse("$baseUrl/login"));
-    req.body = jsonEncode(login.toJson());
-    return _handleRequest(req);
+  static Future<Response> preview(
+    PreviewModel data, {
+    void Function(int count, int total)? onSendProgress,
+    void Function(int count, int total)? onReceiveProgress,
+  }) async {
+    final options = RequestOptions(
+      path: "/preview",
+      method: "POST",
+      data: data.toJson(),
+      responseType: ResponseType.bytes,
+      onSendProgress: onSendProgress,
+      onReceiveProgress: onReceiveProgress,
+    );
+    return _handleRequest(options);
   }
-
-  static Future<Response> preview(PreviewModel data) async {
-    final req = Request("POST", Uri.parse("$baseUrl/preview"));
-    req.body = jsonEncode(data.toJson());
-    return _handleRequest(req);
-  }
-}
-
-class LoginModel {
-  final String name;
-  final String password;
-
-  const LoginModel({required this.name, required this.password});
-
-  factory LoginModel.fromJson(Map<String, dynamic> json) =>
-      LoginModel(name: json["name"]!, password: json["password"]!);
-
-  Map<String, dynamic> toJson() => {"name": name, "password": password};
 }
 
 class PreviewModel {
-  LoginModel login;
+  String? name;
   String? hauptBildBase64;
   String? geburtsDatum;
   List<String>? freunde;
@@ -65,9 +101,13 @@ class PreviewModel {
   String? krassestesErlebnis;
   String? einzigartigkeit;
   String? textVonFreunden;
+  String? babyBildBase64;
+  String? lehrerBildBase64;
+  String? lehrerName;
+  String? lehrerZitat;
 
-  PreviewModel(
-    this.login, {
+  PreviewModel({
+    this.name,
     this.hauptBildBase64,
     this.geburtsDatum,
     this.freunde,
@@ -81,11 +121,15 @@ class PreviewModel {
     this.krassestesErlebnis,
     this.einzigartigkeit,
     this.textVonFreunden,
+    this.babyBildBase64,
+    this.lehrerBildBase64,
+    this.lehrerName,
+    this.lehrerZitat,
   });
 
   factory PreviewModel.fromJson(Map<String, dynamic> json) {
     return PreviewModel(
-      LoginModel.fromJson(json['login']),
+      name: json["name"],
       hauptBildBase64: json['bild_base64'],
       geburtsDatum: json['geburts_datum'],
       freunde:
@@ -102,11 +146,15 @@ class PreviewModel {
       krassestesErlebnis: json['krassestes_erlebnis'],
       einzigartigkeit: json['einzigartigkeit'],
       textVonFreunden: json['text_von_freunden'],
+      babyBildBase64: json['baby_bild_base64'],
+      lehrerBildBase64: json['lehrer_bild_base64'],
+      lehrerName: json['lehrer_name'],
+      lehrerZitat: json['lehrer_zitat'],
     );
   }
 
   Map<String, dynamic> toJson() => {
-        'login': login.toJson(),
+        'name': name,
         'geburts_datum': geburtsDatum,
         'freunde': freunde,
         'zitate': zitate,
@@ -120,5 +168,9 @@ class PreviewModel {
         'text_von_freunden': textVonFreunden,
         'bild_base64': hauptBildBase64,
         'freunde_bilder_base64': freundeBilderBase64,
+        'baby_bild_base64': babyBildBase64,
+        "lehrer_bild_base64": lehrerBildBase64,
+        "lehrer_name": lehrerName,
+        "lehrer_zitat": lehrerZitat,
       };
 }

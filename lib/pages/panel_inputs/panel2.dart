@@ -8,62 +8,66 @@ class Panel2Widget extends StatelessWidget {
 
   final List<String?> freundeBilderBase64 = [null, null, null, null];
   final imgInputs = List<ImageInput>.empty(growable: true);
-  final PreviewModel? lastData;
-  final LoginModel login;
+  String? lehrerBildBase64;
 
-  static const maxZitatLength = 125;
+  static const maxZitatLength = 200;
+  static const maxFriendNameLength = 37;
 
-  Panel2Widget({super.key, required this.lastData, required this.login}) {
-    String name = login.name.split(" ").first;
+  var lehrerNameInput = Input(
+    prompt: const Text("Lehrer Name"),
+    hintText: "Herr Andree",
+    maxLength: maxFriendNameLength,
+  );
+  var lehrerZitatInput = Input(
+    prompt: const Text("Zitat vom Lehrer"),
+    hintText: "Die Q11 ist so ein dummes Volk",
+    maxLength: maxZitatLength,
+  );
+
+  ImageInput? lehrerBildInput;
+
+  Panel2Widget({super.key}) {
     inputs.addAll([
       Input(
         prompt: const Text("Name von Freund 1"),
         hintText: 'Max',
-        maxLength: 16,
-        initialValue: lastData?.freunde?[0],
+        maxLength: maxFriendNameLength,
       ),
       Input(
         prompt: const Text("Zitat von Freund 1"),
-        hintText: '$name ist immer für eine Party zu haben!',
+        hintText: 'Er/Sie ist immer für eine Party zu haben!',
         maxLength: maxZitatLength,
-        initialValue: lastData?.zitate?[0],
       ),
       Input(
         prompt: const Text("Name von Freund 2"),
         hintText: 'Anna',
-        maxLength: 16,
-        initialValue: lastData?.freunde?[1],
+        maxLength: maxFriendNameLength,
       ),
       Input(
         prompt: const Text("Zitat von Freund 2"),
         hintText:
-            'Wenn sich $name etwas in den Kopf gesetzt hat, kann es niemand aufhalten',
+            'Wenn er/sie sich etwas in den Kopf gesetzt hat, kann es niemand aufhalten',
         maxLength: maxZitatLength,
-        initialValue: lastData?.zitate?[1],
       ),
       Input(
         prompt: const Text("Name von Freund 3"),
         hintText: 'Tom',
-        maxLength: 16,
-        initialValue: lastData?.freunde?[2],
+        maxLength: maxFriendNameLength,
       ),
       Input(
         prompt: const Text("Zitat von Freund 3"),
-        hintText: 'Es gibt niemand besseren auf der Welt als $name',
+        hintText: 'Es gibt niemand besseren auf der Welt.',
         maxLength: maxZitatLength,
-        initialValue: lastData?.zitate?[2],
       ),
       Input(
         prompt: const Text("Name von Freund 4"),
         hintText: 'Lisa',
-        maxLength: 16,
-        initialValue: lastData?.freunde?[3],
+        maxLength: maxFriendNameLength,
       ),
       Input(
         prompt: const Text("Zitat von Freund 4"),
         hintText: 'Chaotic Neutral',
         maxLength: maxZitatLength,
-        initialValue: lastData?.zitate?[3],
       ),
     ]);
     imgInputs.addAll(
@@ -75,9 +79,14 @@ class Panel2Widget extends StatelessWidget {
           prompt: "Bild von Freund ${i + 1} (Format: 1:1)",
           base64ImageSelected: (base64Img) =>
               freundeBilderBase64[i] = base64Img,
-          initialImage: lastData?.freundeBilderBase64?[i],
         ),
       ),
+    );
+    lehrerBildInput = ImageInput(
+      height: 100,
+      aspectRatio: 1 / 1,
+      prompt: "Bild vom Lehrer (Format: 1:1)",
+      base64ImageSelected: (base64Img) => lehrerBildBase64 = base64Img,
     );
   }
 
@@ -112,6 +121,23 @@ class Panel2Widget extends StatelessWidget {
               ),
             ),
           ],
+          Card(
+            color: const Color.fromARGB(255, 54, 96, 131),
+            child: Column(
+              children: [
+                const ListTile(
+                  title: Text(
+                    "Lehrer",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+                lehrerBildInput!,
+                const SizedBox(height: 10),
+                lehrerNameInput,
+                lehrerZitatInput,
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -132,9 +158,14 @@ class Panel2Widget extends StatelessWidget {
       freundeBilder.add(img);
     }
 
+    if (lehrerBildBase64 == null) return "Es Fehlt noch das Bild vom Lehrer";
+
     preview.freundeBilderBase64 = freundeBilder;
     preview.zitate = zitate;
     preview.freunde = freunde;
+    preview.lehrerName = lehrerNameInput.getInput();
+    preview.lehrerZitat = lehrerZitatInput.getInput();
+    preview.lehrerBildBase64 = lehrerBildBase64;
 
     return null;
   }

@@ -6,53 +6,44 @@ import '../edit.dart';
 class Panel3Widget extends StatelessWidget {
   final inputs = List<Input>.empty(growable: true);
 
-  final PreviewModel? lastData;
+  static const maxTextLength = 42;
 
-  static const maxTextLength = 41;
-
-  Panel3Widget({super.key, required this.lastData}) {
+  Panel3Widget({super.key}) {
     inputs.addAll([
       Input(
         prompt: const Text("Lieblingslehrer"),
         hintText: "Herr X",
         maxLength: maxTextLength,
-        initialValue: lastData?.lieblingslehrer,
       ),
       Input(
         prompt: const Text("Lieblingsfächer"),
         hintText: "Mathe, Deutsch und Englisch",
         maxLength: maxTextLength,
-        initialValue: lastData?.lieblingsfaecher,
       ),
       Input(
         prompt: const Text("Lieblingsbeschäftigung"),
         hintText: "Essen",
         maxLength: maxTextLength,
-        initialValue: lastData?.lieblingsbeschaeftigung,
       ),
       Input(
         prompt: const Text("Pläne nach dem Abi"),
         hintText: "Astrobotanik studieren",
         maxLength: maxTextLength,
-        initialValue: lastData?.plaene,
       ),
       Input(
         prompt: const Text("Größter außerschulischer Erfolg"),
         hintText: "Meine Geburt",
         maxLength: maxTextLength,
-        initialValue: lastData?.groessterErfolg,
       ),
       Input(
         prompt: const Text("Krassestes Unterrichtserlebnis"),
         hintText: "Toilette ist explodiert",
         maxLength: maxTextLength,
-        initialValue: lastData?.krassestesErlebnis,
       ),
       Input(
         prompt: const Text("Was mich einzigartig macht"),
         hintText: "Niemand kann bessere Kekse backen als Ich!",
         maxLength: maxTextLength,
-        initialValue: lastData?.einzigartigkeit,
       ),
     ]);
   }

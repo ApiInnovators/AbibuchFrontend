@@ -13,20 +13,11 @@ import 'package:image_picker_web/image_picker_web.dart';
 import '../api/api.dart';
 
 class EditPage extends StatelessWidget {
-  final LoginModel login;
-  final PreviewModel? lastSubmittedData;
-
-  const EditPage({
-    super.key,
-    required this.login,
-    required this.lastSubmittedData,
-  });
+  const EditPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     final inputWidget = InputWidget(
-      login: login,
-      lastSubmittedData: lastSubmittedData,
       onPreview: (PreviewModel data) => Navigator.push(
         context,
         MaterialPageRoute(
@@ -52,17 +43,9 @@ class EditPage extends StatelessWidget {
 }
 
 class InputWidget extends StatefulWidget {
-  final LoginModel login;
-  final PreviewModel? lastSubmittedData;
-
   final void Function(PreviewModel data) onPreview;
 
-  const InputWidget({
-    super.key,
-    required this.login,
-    required this.lastSubmittedData,
-    required this.onPreview,
-  });
+  const InputWidget({super.key, required this.onPreview});
 
   @override
   State<InputWidget> createState() => _InputWidgetState();
@@ -71,22 +54,11 @@ class InputWidget extends StatefulWidget {
 class _InputWidgetState extends State<InputWidget> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  late final GenerellPanelWidget generellInput = GenerellPanelWidget(
-    lastData: widget.lastSubmittedData,
-    login: widget.login,
-  );
-  late final Panel1Widget panel1Input =
-      Panel1Widget(lastData: widget.lastSubmittedData);
-  late final Panel2Widget panel2Input = Panel2Widget(
-    lastData: widget.lastSubmittedData,
-    login: widget.login,
-  );
-  late final Panel3Widget panel3Input =
-      Panel3Widget(lastData: widget.lastSubmittedData);
-  late final Panel4Widget panel4Input = Panel4Widget(
-    login: widget.login,
-    lastData: widget.lastSubmittedData,
-  );
+  late final GenerellPanelWidget generellInput = GenerellPanelWidget();
+  late final Panel1Widget panel1Input = Panel1Widget();
+  late final Panel2Widget panel2Input = Panel2Widget();
+  late final Panel3Widget panel3Input = Panel3Widget();
+  late final Panel4Widget panel4Input = Panel4Widget();
 
   @override
   Widget build(BuildContext context) {
@@ -107,6 +79,12 @@ class _InputWidgetState extends State<InputWidget> {
               child: ElevatedButton(
                 onPressed: () {
                   if (!_formKey.currentState!.validate() && !kDebugMode) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                            "Es wurden noch nicht alle Felder ausgefüllt."),
+                      ),
+                    );
                     return;
                   }
 
@@ -130,7 +108,7 @@ class _InputWidgetState extends State<InputWidget> {
   }
 
   (PreviewModel? data, String error) generateData() {
-    final preview = PreviewModel(widget.login);
+    final preview = PreviewModel();
     String? error;
     error ??= generellInput.fillPreview(preview);
     error ??= panel1Input.fillPreview(preview);
@@ -149,7 +127,6 @@ class Input extends StatelessWidget {
   final controller = TextEditingController();
   final Widget? suffix;
   final String? Function(String value)? additionalValidator;
-  final String? initialValue;
 
   Input({
     super.key,
@@ -158,10 +135,7 @@ class Input extends StatelessWidget {
     required this.maxLength,
     this.suffix,
     this.additionalValidator,
-    this.initialValue,
-  }) {
-    if (initialValue != null) controller.text = initialValue!;
-  }
+  });
 
   @override
   Widget build(BuildContext context) {

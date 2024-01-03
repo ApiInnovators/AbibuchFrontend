@@ -1,41 +1,68 @@
 import 'dart:convert';
 import 'dart:html';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:hgv_abibuch/api/api.dart';
 
-class PreviewPage extends StatelessWidget {
+class PreviewPage extends StatefulWidget {
   final PreviewModel inputData;
 
   const PreviewPage({super.key, required this.inputData});
 
   @override
+  State<PreviewPage> createState() => _PreviewPageState();
+}
+
+class _PreviewPageState extends State<PreviewPage> {
+  late Future<Response> previewData;
+  double sendProgress = 0;
+  double receiveProgress = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    previewData = Api.preview(
+      widget.inputData,
+      onReceiveProgress: (count, total) {
+        setState(() => receiveProgress = count / total);
+      },
+      onSendProgress: (count, total) {
+        setState(() => sendProgress = count / total);
+      },
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final totalProgress = (sendProgress + receiveProgress) / 2;
     return Scaffold(
-      appBar: AppBar(title: const Text("Vorschau")),
+      appBar: AppBar(
+        bottom: totalProgress == 1
+            ? null
+            : PreferredSize(
+                preferredSize: const Size.fromHeight(4),
+                child: LinearProgressIndicator(value: totalProgress),
+              ),
+        title: const Text("Vorschau"),
+      ),
       body: FutureBuilder(
-        future: Api.preview(inputData),
+        future: previewData,
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
-            return const Center(
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text("Lade Vorschau..."),
-                  SizedBox(width: 10),
-                  CircularProgressIndicator(),
-                ],
-              ),
-            );
+            return const Center(child: Text("Lade Vorschau..."));
           }
           if (snapshot.hasError) return const Text("Error");
 
           if (snapshot.requireData.statusCode != 200) {
-            return Text(
-                "Error: ${snapshot.requireData.statusCode}\n${snapshot.requireData.body}");
+            return Center(
+              child: Text(
+                "Error: ${snapshot.requireData.statusCode}\n${snapshot.requireData.data}",
+              ),
+            );
           }
 
-          final imgData = snapshot.requireData.bodyBytes;
+          final imgData = snapshot.requireData.data;
 
           return Column(
             children: [
@@ -45,8 +72,11 @@ class PreviewPage extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     ElevatedButton.icon(
-                      onPressed: () => download(imgData,
-                          "Abibuch ${inputData.login.name}.png", "image/png"),
+                      onPressed: () => download(
+                        imgData,
+                        "Abibuchseite von ${widget.inputData.name}.png",
+                        "image/png",
+                      ),
                       icon: const Icon(Icons.download),
                       label: const Text("Als Bild herunterladen"),
                     ),
